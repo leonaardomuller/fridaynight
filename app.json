@@ -3,8 +3,15 @@
     "name": "fridaynight",
     "slug": "fridaynight",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "assetBundlePatterns": ["**/*"],
+    "plugins": ["@react-native-firebase/app"],
+    "android": {
+      "package": "com.fridaynight",
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "bundleIdentifier": "com.fridaynight",
+      "googleServicesFile": "./GoogleService-Info.plist"
+    }
   }
 }

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "48920864113",
+    "project_id": "friday-night-b442c",
+    "storage_bucket": "friday-night-b442c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48920864113:android:702431c9da58928ec302d0",
+        "android_client_info": {
+          "package_name": "com.fridaynight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "48920864113-22cd4jrh60653h4v9l7f9l9eem2chdah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-dM448all7U_xYFlgXyrYfO0jvb3GlmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "48920864113-22cd4jrh60653h4v9l7f9l9eem2chdah.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "48920864113-rc4tc539rion02ls1h7biu6nces064or.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fridaynight"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

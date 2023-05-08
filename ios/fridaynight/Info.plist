@@ -51,5 +51,9 @@
 	<false/>
   <key>UIStatusBarStyle</key>
   <string>UIStatusBarStyleDefault</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+  <string>Your app needs access to your location when you use it.</string>
+  <key>NSLocationAlwaysUsageDescription</key>
+  <string>Your app needs access to your location when you use it.</string>
 </dict>
 </plist>
