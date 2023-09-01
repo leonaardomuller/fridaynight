@@ -1,27 +1,39 @@
 import {
-  VStack,
-  HStack,
   Heading,
   Text,
   Image,
-  Center,
-  Box,
   Container,
   Pressable,
-  IPressableProps,
   useTheme,
 } from "native-base";
-import { useState } from "react";
-interface Props {
-  title: string;
-  quantityFollowers: number;
-  isSelected?: boolean;
+import React, { useState } from "react";
+import { InterestProps, CustomerProps } from "../screens/Interests";
+interface InterestCardProps {
+  id: string;
+  gender: string;
+  imageUrl: string;
+  followers: CustomerProps[];
   index: number;
+  handleSelectInterests: (interestSelected: string) => void;
 }
-export function InterestCard({ title, quantityFollowers, index }: Props) {
+
+export const InterestCard: React.FC<InterestCardProps> = ({
+  id,
+  imageUrl,
+  gender,
+  followers,
+  handleSelectInterests,
+  index,
+}: InterestCardProps) => {
   const { colors } = useTheme();
   const [isSelected, setIsSelected] = useState(false);
-  const isLast = index % 2 === 1 ? true : false;
+  const isLast = index % 2 === 1;
+
+  const handlePress = () => {
+    setIsSelected(!isSelected);
+    handleSelectInterests(id);
+  };
+
   return (
     <Container
       w="full"
@@ -34,28 +46,26 @@ export function InterestCard({ title, quantityFollowers, index }: Props) {
       <Pressable
         w="full"
         alignItems="center"
-        onPress={() => setIsSelected(!isSelected)}
+        onPress={handlePress}
         borderWidth={2}
         borderColor={isSelected ? colors.purple[1] : colors.white}
         rounded="3xl"
       >
         <Image
           source={{
-            uri: "https://picsum.photos/200/200",
+            uri: `https://source.unsplash.com/400x400/?${gender}%20music`,
           }}
-          alt="Alternate Text"
+          alt="Interest"
           h="90px"
-          mt={4}
-          ml={4}
-          m={4}
-          w="full"
+          w="90%"
+          mt={2}
           rounded="xl"
         />
         <Heading fontSize="xl" mt={2} mb={2}>
-          {title}
+          {gender}
         </Heading>
-        <Text mb={4}>{quantityFollowers} followers</Text>
+        <Text mb={4}>{followers?.length ?? 0} followers</Text>
       </Pressable>
     </Container>
   );
-}
+};

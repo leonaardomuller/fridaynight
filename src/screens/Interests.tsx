@@ -1,42 +1,120 @@
 import { useNavigation } from "@react-navigation/native";
 import {
   HStack,
-  IconButton,
   VStack,
   useTheme,
   Text,
   Heading,
   ScrollView,
-  FlatList,
 } from "native-base";
-import { CaretLeft, Scroll } from "phosphor-react-native";
+import auth from "@react-native-firebase/auth";
 import { Button } from "../components/Button";
-import { Example } from "../components/Example";
-import { Logout } from "../components/Logout";
 import { InterestCard } from "../components/InterestCard";
 import { Header } from "../components/Header";
-function getRandomArbitrary(min, max) {
-  return Math.trunc(Math.random() * (max - min) + min);
-}
-const interests = [
-  { title: "Sertanejo", followers: getRandomArbitrary(100, 10000) },
-  { title: "Rock", followers: getRandomArbitrary(100, 10000) },
-  { title: "Country", followers: getRandomArbitrary(100, 10000) },
-  { title: "Samba", followers: getRandomArbitrary(100, 10000) },
-  { title: "Pagode", followers: getRandomArbitrary(100, 10000) },
-  { title: "Hip Hop", followers: getRandomArbitrary(100, 10000) },
-  { title: "Reggae", followers: getRandomArbitrary(100, 10000) },
-  { title: "Techno", followers: getRandomArbitrary(100, 10000) },
-  { title: "Sertanejo", followers: getRandomArbitrary(100, 10000) },
-];
+import { useEffect, useState } from "react";
+import firestore from "@react-native-firebase/firestore";
+
+export type CustomerProps = {
+  id: string;
+  name: string;
+  interests: InterestProps[];
+};
+
+export type InterestProps = {
+  id: string;
+  gender: string;
+  imageUrl: string;
+  followers: CustomerProps[];
+};
 
 export function Interests() {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [interests, setInterests] = useState<InterestProps[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<String[]>([]);
+  useEffect(() => {
+    const currentUser = auth().currentUser;
+    const customersCollection = firestore().collection("customers");
+    const query = customersCollection.where("id", "==", currentUser.uid);
+    query.get().then((querySnapshot) => {
+      if (querySnapshot.size > 0) {
+        navigation.navigate("home");
+        console.log("User already exists in the 'customers' collection.");
+      }
+    });
+
+    const fetchInterests = async () => {
+      const querySnapshot = await firestore().collection("interests").get();
+      const interestsData: InterestProps[] = querySnapshot.docs.map((doc) => {
+        const data = doc.data() as InterestProps;
+        return data;
+      });
+      setInterests(interestsData);
+      setSelectedInterests([]);
+    };
+
+    fetchInterests();
+  }, []);
 
   function handleFinishInterestsSelection() {
     navigation.navigate("home");
   }
+
+  function handleSelectInterests(id: string) {
+    if (selectedInterests.includes(id)) {
+      // Remove o interesse selecionado se ele já estiver presente no array
+      setSelectedInterests(selectedInterests.filter((item) => item !== id));
+    } else {
+      // Adiciona o interesse selecionado se ele ainda não estiver no array
+      setSelectedInterests([...selectedInterests, id]);
+    }
+  }
+
+  function handleSetSelectedInterests() {
+    setIsLoading(true);
+    const currentUser = auth().currentUser;
+    firestore()
+      .collection("customers")
+      .add({
+        id: currentUser.uid,
+        name: currentUser.displayName,
+        interests: selectedInterests,
+      })
+      .then(() => {
+        alert("Interesses registrados.");
+        navigation.navigate("home");
+      });
+
+    console.log(currentUser);
+
+    // firestore()
+    //   .collection("customers")
+    //   .where("id", "==", "409e1763-16c2-4a38-84b6-1eac227e3294")
+    //   .onSnapshot((snapshot) => {
+    //     console.log(snapshot.docs);
+    //     const data = snapshot.docs.map((doc) => {
+    //       const { id, name, interests } = doc.data();
+    //       console.log(id, name, interests);
+    //       return {
+    //         id,
+    //         name,
+    //         interests: selectedInterests,
+    //       };
+    //     });
+    //     return data;
+    //   });
+    // .then(() => {
+    //   alert("Solicitação registrada com sucesso.");
+    //   navigation.goBack();
+    // })
+    // .catch((error) => {
+    //   console.log(error);
+    //   setIsLoading(false);
+    //   return alert("Não foi possível registrar o pedido");
+    // });
+  }
+
   return (
     <VStack flex={1} bg="white">
       <Header title="Interests" />
@@ -52,19 +130,22 @@ export function Interests() {
           contentContainerStyle={{ paddingBottom: 64 }}
         >
           <HStack flexWrap="wrap">
-            {interests.map(({ title, followers }, index) => {
-              return (
+            {interests.map(
+              ({ id, gender, imageUrl, followers }: InterestProps, index) => (
                 <InterestCard
-                  key={index}
+                  key={id}
+                  id={id}
+                  gender={gender}
+                  imageUrl={imageUrl}
+                  followers={followers}
                   index={index}
-                  title={title}
-                  quantityFollowers={followers}
+                  handleSelectInterests={handleSelectInterests}
                 />
-              );
-            })}
+              )
+            )}
           </HStack>
         </ScrollView>
-        <Button title="Finish" onPress={handleFinishInterestsSelection} />
+        <Button title="Finish" onPress={handleSetSelectedInterests} />
       </VStack>
     </VStack>
   );

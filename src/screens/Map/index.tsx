@@ -22,6 +22,9 @@ export function Map() {
   useEffect(() => {
     requestLocationPermission();
   }, []);
+  //REACT NATIVE MAPS
+  //https://blog.rocketseat.com.br/construindo-um-app-com-mapas-usando-react-native-maps-e-mapbox/
+  //REACT NATIVE SNAP CAROUSEL
 
   const requestLocationPermission = async () => {
     if (Platform.OS === "android") {
