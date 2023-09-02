@@ -6,13 +6,15 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { HStack, View } from "native-base";
-import MapView, { Marker, Circle } from "react-native-maps";
+import MapView, { Marker, Circle, MapPressEvent } from "react-native-maps";
 import { CustomMarker } from "./components/CustomMarker";
 import Geolocation from "react-native-geolocation-service";
 import { ButtonGoBack } from "../../components/ButtonGoBack";
 import { SearchInput } from "./components/SearchInput";
 import { Card } from "./components/Carousel/components/Card";
 import Carousel from "react-native-snap-carousel";
+import { useSelectedCardsCoordinates } from "../../stores/selected-card-coordinates";
+import { generateEventName } from "./utils";
 
 export function Map() {
   const carouselRef = useRef(null);
@@ -27,21 +29,27 @@ export function Map() {
   });
   const [location, setLocation] = useState(null);
   const [markers, setMarkers] = useState([]);
+  const { latitude, longitude, setCoordinates } = useSelectedCardsCoordinates();
 
   useEffect(() => {
     requestLocationPermission();
   }, []);
 
+  useEffect(() => {
+    setRegion({
+      latitude,
+      longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    });
+  }, [latitude, longitude]);
+
+  useEffect(() => {
+    console.log(region);
+  }, [region]);
+
   const setLocationData = (latitude, longitude) => {
     const dif = 0.003;
-    setMarkers([
-      createMarker("Event 1", latitude + dif, longitude + dif),
-      createMarker("Event 2", latitude - dif, longitude - dif),
-      createMarker("Event 3", latitude + dif, longitude + dif * 7),
-      createMarker("Event 4", latitude - dif, longitude - dif * 7),
-      createMarker("Event 5", latitude + dif, longitude + dif * 10),
-      createMarker("Event 6", latitude - dif, longitude - dif * 10),
-    ]);
     setInitialRegion(createRegion(latitude, longitude));
     setRegion({ ...region, latitude, longitude });
     setLocation({ latitude, longitude });
@@ -113,6 +121,30 @@ export function Map() {
     }
   };
 
+  const onMapPress = (e: MapPressEvent) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    const randomEventName = generateEventName();
+    const newMarker = createMarker(randomEventName, latitude, longitude);
+    setMarkers([...markers, newMarker]);
+    console.log(e.nativeEvent.coordinate);
+  };
+
+  const handleSlideChange = (index: number) => {
+    console.log(index);
+    const currentMarker = markers[index];
+    if (currentMarker) {
+      console.log(
+        "Setting coordinates to",
+        currentMarker.location.latitude,
+        currentMarker.location.longitude
+      );
+      setCoordinates(
+        currentMarker.location.latitude,
+        currentMarker.location.longitude
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <HStack
@@ -129,7 +161,9 @@ export function Map() {
       <MapView
         style={styles.map}
         initialRegion={initialRegion}
+        region={region}
         onRegionChangeComplete={setRegion}
+        onPress={onMapPress}
       >
         {markers.map((data) => (
           <Marker key={data.name} coordinate={data.location}>
@@ -147,9 +181,10 @@ export function Map() {
         <Carousel
           ref={carouselRef}
           data={markers}
-          renderItem={({ item }) => <Card />}
+          renderItem={() => <Card {...markers} />}
           sliderWidth={width}
           itemWidth={width}
+          onSnapToItem={handleSlideChange}
         />
       </View>
     </View>

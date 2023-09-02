@@ -13,7 +13,8 @@ import {
 import { MapPin } from "phosphor-react-native";
 
 import Members from "../../../../../assets/members.svg";
-export function Card() {
+
+export function Card(props) {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
