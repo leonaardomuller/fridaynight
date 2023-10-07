@@ -44,10 +44,6 @@ export function Map() {
     });
   }, [latitude, longitude]);
 
-  useEffect(() => {
-    console.log(region);
-  }, [region]);
-
   const setLocationData = (latitude, longitude) => {
     const dif = 0.003;
     setInitialRegion(createRegion(latitude, longitude));
@@ -126,18 +122,11 @@ export function Map() {
     const randomEventName = generateEventName();
     const newMarker = createMarker(randomEventName, latitude, longitude);
     setMarkers([...markers, newMarker]);
-    console.log(e.nativeEvent.coordinate);
   };
 
   const handleSlideChange = (index: number) => {
-    console.log(index);
     const currentMarker = markers[index];
     if (currentMarker) {
-      console.log(
-        "Setting coordinates to",
-        currentMarker.location.latitude,
-        currentMarker.location.longitude
-      );
       setCoordinates(
         currentMarker.location.latitude,
         currentMarker.location.longitude
