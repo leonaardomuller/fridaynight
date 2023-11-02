@@ -3,9 +3,10 @@ import { ButtonGoBack } from "./ButtonGoBack";
 
 type Props = StyledProps & {
   title: string;
+  showButtonGoBack?: boolean;
 };
 
-export function Header({ title, ...rest }: Props) {
+export function Header({ title, showButtonGoBack, ...rest }: Props) {
   return (
     <HStack
       w="full"
@@ -17,7 +18,7 @@ export function Header({ title, ...rest }: Props) {
       pt={12}
       {...rest}
     >
-      <ButtonGoBack />
+      {showButtonGoBack && <ButtonGoBack />}
 
       <Heading color="gray.1" textAlign="center" fontSize="lg" flex={1} ml={-6}>
         {title}

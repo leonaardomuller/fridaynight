@@ -70,7 +70,6 @@ export function OwnerMap() {
       (position) => {
         const dif = 0.003;
         const { latitude, longitude } = position.coords;
-        console.log(latitude, longitude);
         setMarkers([
           {
             name: "Event 1",

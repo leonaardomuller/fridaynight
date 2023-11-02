@@ -7,12 +7,12 @@ import {
   useTheme,
 } from "native-base";
 import React, { useState } from "react";
-import { InterestProps, CustomerProps } from "../screens/Interests";
+import { Customer } from "../screens/Interests";
 interface InterestCardProps {
   id: string;
   gender: string;
   imageUrl: string;
-  followers: CustomerProps[];
+  followers: Customer[];
   index: number;
   handleSelectInterests: (interestSelected: string) => void;
 }
@@ -59,7 +59,7 @@ export const InterestCard: React.FC<InterestCardProps> = ({
           h="90px"
           w="90%"
           mt={2}
-          rounded="xl"
+          rounded="2xl"
         />
         <Heading fontSize="xl" mt={2} mb={2}>
           {gender}

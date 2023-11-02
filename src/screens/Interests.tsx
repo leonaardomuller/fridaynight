@@ -12,9 +12,9 @@ import { Button } from "../components/Button";
 import { InterestCard } from "../components/InterestCard";
 import { Header } from "../components/Header";
 import { useEffect, useState } from "react";
-import firestore from "@react-native-firebase/firestore";
+import { getGenericPassword as getToken } from "react-native-keychain";
 
-export type CustomerProps = {
+export type Customer = {
   id: string;
   name: string;
   interests: InterestProps[];
@@ -24,7 +24,7 @@ export type InterestProps = {
   id: string;
   gender: string;
   imageUrl: string;
-  followers: CustomerProps[];
+  followers: Customer[];
 };
 
 export function Interests() {
@@ -33,33 +33,52 @@ export function Interests() {
   const [isLoading, setIsLoading] = useState(false);
   const [interests, setInterests] = useState<InterestProps[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<String[]>([]);
-  useEffect(() => {
-    const currentUser = auth().currentUser;
-    const customersCollection = firestore().collection("customers");
-    const query = customersCollection.where("id", "==", currentUser.uid);
-    query.get().then((querySnapshot) => {
-      if (querySnapshot.size > 0) {
-        navigation.navigate("home");
-        console.log("User already exists in the 'customers' collection.");
-      }
-    });
 
+  useEffect(() => {
     const fetchInterests = async () => {
-      const querySnapshot = await firestore().collection("interests").get();
-      const interestsData: InterestProps[] = querySnapshot.docs.map((doc) => {
-        const data = doc.data() as InterestProps;
-        return data;
-      });
-      setInterests(interestsData);
+      const token = await getToken().then((credential) => credential.password);
+
+      const interestsData = await fetch(`http://localhost:3333/interests`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((data) => {
+          return data;
+        })
+        .then((response) => {
+          return response.json();
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+      setInterests(interestsData.interests);
       setSelectedInterests([]);
     };
 
     fetchInterests();
   }, []);
 
-  function handleFinishInterestsSelection() {
-    navigation.navigate("home");
-  }
+  useEffect(() => {
+    const fetchInterests = async () => {
+      const token = await getToken().then((credential) => credential.password);
+      const interestsData = await fetch(`http://localhost:3333/interests`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((data) => data)
+        .then((response) => response.json())
+        .catch((error) => {
+          console.log({ error });
+        });
+      setInterests(interestsData.interests);
+      setSelectedInterests([]);
+    };
+
+    fetchInterests();
+  }, []);
 
   function handleSelectInterests(id: string) {
     if (selectedInterests.includes(id)) {
@@ -71,53 +90,33 @@ export function Interests() {
     }
   }
 
-  function handleSetSelectedInterests() {
+  async function handleSetSelectedInterests() {
     setIsLoading(true);
-    const currentUser = auth().currentUser;
-    firestore()
-      .collection("customers")
-      .add({
-        id: currentUser.uid,
-        name: currentUser.displayName,
-        interests: selectedInterests,
+    const token = await getToken().then((credential) => credential.password);
+    await fetch(`http://localhost:3333/interests`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ interestIds: selectedInterests }),
+    })
+      .then((response) => {
+        return response.json();
       })
-      .then(() => {
-        alert("Interesses registrados.");
+      .catch((error) => {
+        console.log({ error });
+      })
+      .finally(() => {
         navigation.navigate("home");
+        setIsLoading(false);
       });
-
-    console.log(currentUser);
-
-    // firestore()
-    //   .collection("customers")
-    //   .where("id", "==", "409e1763-16c2-4a38-84b6-1eac227e3294")
-    //   .onSnapshot((snapshot) => {
-    //     console.log(snapshot.docs);
-    //     const data = snapshot.docs.map((doc) => {
-    //       const { id, name, interests } = doc.data();
-    //       console.log(id, name, interests);
-    //       return {
-    //         id,
-    //         name,
-    //         interests: selectedInterests,
-    //       };
-    //     });
-    //     return data;
-    //   });
-    // .then(() => {
-    //   alert("Solicitação registrada com sucesso.");
-    //   navigation.goBack();
-    // })
-    // .catch((error) => {
-    //   console.log(error);
-    //   setIsLoading(false);
-    //   return alert("Não foi possível registrar o pedido");
-    // });
+    setSelectedInterests([]);
   }
 
   return (
     <VStack flex={1} bg="white">
-      <Header title="Interests" />
+      <Header title="Interests" showButtonGoBack={false} />
       <VStack flex={1} bg="gray.4" px={8} pt={4} rounded="2xl">
         <Heading mb={2}>Choose Interests</Heading>
         <Text color={colors.gray[1]} mb={2}>
@@ -130,7 +129,7 @@ export function Interests() {
           contentContainerStyle={{ paddingBottom: 64 }}
         >
           <HStack flexWrap="wrap">
-            {interests.map(
+            {interests?.map(
               ({ id, gender, imageUrl, followers }: InterestProps, index) => (
                 <InterestCard
                   key={id}
