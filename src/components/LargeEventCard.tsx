@@ -13,7 +13,7 @@ import {
 import { MapPin } from "phosphor-react-native";
 
 import Members from "../assets/members.svg";
-export function LargeEventCard() {
+export function LargeEventCard(props) {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -33,7 +33,7 @@ export function LargeEventCard() {
           rounded="xl"
         />
         <VStack p={4}>
-          <Heading mb={2}>2000's Hip Hop</Heading>
+          <Heading mb={2}>{props.title}</Heading>
           <HStack justifyContent="space-between">
             <Box flexDirection="row" alignItems="center">
               <IconButton icon={<MapPin color={colors.gray[1]} size={16} />} />

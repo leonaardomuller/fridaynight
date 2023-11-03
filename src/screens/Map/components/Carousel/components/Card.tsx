@@ -42,7 +42,7 @@ export function Card(props) {
           rounded="xl"
         />
         <VStack p={4}>
-          <Heading mb={2}>2000's Hip Hop</Heading>
+          <Heading mb={2}>{props.name}</Heading>
           <HStack justifyContent="space-between">
             <Box flexDirection="row" alignItems="center">
               <IconButton icon={<MapPin color={colors.gray[1]} size={16} />} />

@@ -11,14 +11,16 @@ import {
   VStack,
 } from "native-base";
 import { Heart } from "phosphor-react-native";
+import { formatDate } from "../utils/format-date";
 
-export function SmallEventCard() {
+export function SmallEventCard(props) {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
   function handleNavigateToDetailsPage() {
     navigation.navigate("details");
   }
+
   return (
     <Pressable onPress={handleNavigateToDetailsPage} mb={4}>
       <HStack bg="white" rounded="xl">
@@ -35,13 +37,13 @@ export function SmallEventCard() {
         />
         <VStack p={4}>
           <VStack justifyContent="space-between" maxW="150px">
-            <Text color={colors.purple[1]}>23 Oct - 10:00 PM</Text>
-            <Text color={colors.gray[1]}>Disco Tehran - Goodbye Party</Text>
+            <Text color={colors.purple[1]}>{formatDate(props.startsAt)}</Text>
+            <Text color={colors.gray[1]}>{props.title}</Text>
           </VStack>
         </VStack>
-        <Box>
+        {/* <Box>
           <IconButton icon={<Heart color={colors.gray[2]} size={24} />} />
-        </Box>
+        </Box> */}
       </HStack>
     </Pressable>
   );

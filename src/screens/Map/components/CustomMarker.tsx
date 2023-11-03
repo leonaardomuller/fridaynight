@@ -19,15 +19,18 @@ export function CustomMarker({ name }) {
 
 const styles = StyleSheet.create({
   gradient: {
+    bottom: 40,
+    right: "20%",
     borderRadius: 50,
   },
   marker: {
-    paddingVertical: 10,
-    paddingHorizontal: 30,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     borderRadius: 50,
     elevation: 10,
   },
   text: {
     color: "#fff",
+    fontWeight: "bold",
   },
 });

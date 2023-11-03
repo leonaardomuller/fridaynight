@@ -13,18 +13,89 @@ import {
 } from "native-base";
 import { MagnifyingGlass, SignOut, MapPin } from "phosphor-react-native";
 import { Alert } from "react-native";
+import { getGenericPassword as getToken } from "react-native-keychain";
 import auth from "@react-native-firebase/auth";
-import { Header } from "../components/Header";
+import Geolocation from "react-native-geolocation-service";
 import { useNavigation } from "@react-navigation/native";
 import { LargeEventCard } from "../components/LargeEventCard";
 import { SmallEventCard } from "../components/SmallEventCard";
-const popularEvents = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-];
+import { useCallback, useEffect, useState } from "react";
+
+type LocationDetails = {
+  country_state: string;
+  city: string;
+  country: string;
+  country_code: string;
+  neighbourhood?: string;
+  postcode: string;
+  railway?: string;
+  road: string;
+  state: string;
+};
 
 export function Home() {
   const { colors } = useTheme();
   const navigation = useNavigation();
+  const [currentAddress, setCurrentAddress] = useState<LocationDetails>(
+    {} as LocationDetails
+  );
+  const [events, setEvents] = useState([]);
+
+  const getLocation = useCallback(async () => {
+    try {
+      Geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+        fetch(url)
+          .then((res) => res.json())
+          .then((data) =>
+            setCurrentAddress({
+              country_state: data.address["ISO3166-2-lvl4"],
+              city: data.address.city,
+              country: data.address.country,
+              country_code: data.address.country_code,
+              neighbourhood: data.address.neighbourhood,
+              postcode: data.address.postcode,
+              railway: data.address.railway,
+              road: data.address.road,
+              state: data.address.state,
+            })
+          );
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const token = await getToken().then(
+          (credential) => credential.password
+        );
+        const response = await fetch(`http://localhost:3333/events`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const eventsData = await response.json();
+        setEvents(eventsData.events);
+      } catch (error) {
+        console.log({ error });
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   function handleLogout() {
     auth()
@@ -77,7 +148,9 @@ export function Home() {
             <Text fontSize={16} color={colors.gray[1]}>
               Find throw the map
             </Text>
-            <Text color={colors.gray[1]}>New York, US</Text>
+            <Text color={colors.gray[1]}>
+              {currentAddress.city + ", " + currentAddress.country_state}
+            </Text>
           </VStack>
           <Box h="50px" w="50px">
             <Image
@@ -94,7 +167,7 @@ export function Home() {
       </Pressable>
 
       <Heading mb={2}>Featured</Heading>
-      <LargeEventCard />
+      <LargeEventCard {...events[0]} />
       <Heading mb={2} mt={6}>
         Popular Events
       </Heading>
@@ -104,8 +177,8 @@ export function Home() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 64 }}
       >
-        {popularEvents.map((number) => {
-          return <SmallEventCard key={number} />;
+        {events.slice(1).map((event) => {
+          return <SmallEventCard key={event.id} {...event} />;
         })}
       </ScrollView>
     </VStack>
