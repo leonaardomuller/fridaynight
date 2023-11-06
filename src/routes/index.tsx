@@ -4,10 +4,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SignIn } from "../screens/SignIn";
 import { AppRoutes } from "./app.routes";
 import { Loading } from "../components/Loading";
+import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";
 
 export function Routes() {
   const [loading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<FirebaseAuthTypes.User>();
+  const { user, setUser } = useUserAuthenticatedStore();
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged((response) => {

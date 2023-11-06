@@ -16,13 +16,15 @@ import {
 import { Header } from "../components/Header";
 import { Input } from "../components/Input";
 import { SmallEventCard } from "../components/SmallEventCard";
-
-const popularEvents = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-];
+import { useEventsStore } from "../stores/events-store";
+import { useMyCurrentLocationStore } from "../stores/my-current-location-store";
 
 export function Search() {
   const { colors } = useTheme();
+
+  const { events } = useEventsStore();
+  const { road, city } = useMyCurrentLocationStore();
+
   return (
     <VStack flex={1} bg="white">
       <Header title="Search"></Header>
@@ -42,7 +44,6 @@ export function Search() {
             InputLeftElement={
               <Icon as={<MagnifyingGlass color={colors.gray[1]} />} ml={4} />
             }
-            // onChangeText={setEmail}
           />
           <Center h="full" bg="white" rounded="2xl" px={2} ml={4}>
             <IconButton
@@ -59,7 +60,7 @@ export function Search() {
         >
           <IconButton icon={<MapPin color={colors.gray[1]} size={24} />} />
           <Text fontSize={16} color={colors.gray[1]}>
-            My current location
+            {road + ", " + city}
           </Text>
         </HStack>
         <ScrollView
@@ -67,8 +68,8 @@ export function Search() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 64 }}
         >
-          {popularEvents.map((event) => {
-            return <SmallEventCard key={event} />;
+          {events.map((event) => {
+            return <SmallEventCard key={event.id} {...event} />;
           })}
         </ScrollView>
       </VStack>

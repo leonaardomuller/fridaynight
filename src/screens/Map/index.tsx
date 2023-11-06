@@ -15,11 +15,12 @@ import { ButtonGoBack } from "../../components/ButtonGoBack";
 import { SearchInput } from "./components/SearchInput";
 import { Card } from "./components/Carousel/components/Card";
 import Carousel from "react-native-snap-carousel";
-import { useSelectedCardsCoordinates } from "../../stores/selected-card-coordinates";
+import { useSelectedCardsCoordinates } from "../../stores/selected-card-coordinates-store";
 import { getGenericPassword as getToken } from "react-native-keychain";
 import { Input } from "../../components/Input";
 import { Picker } from "@react-native-picker/picker";
-import { InterestProps } from "../Interests";
+import { useEventsStore } from "../../stores/events-store";
+import { useInterestsStore } from "../../stores/interests-store";
 
 export function Map() {
   const carouselRef = useRef(null);
@@ -32,8 +33,6 @@ export function Map() {
   const [eventName, setEventName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [currentMarker, setCurrentMarker] = useState({});
-
-  const [interests, setInterests] = useState<InterestProps[]>([]);
 
   const [isDatePickerStartsDateVisible, setDatePickerStartsDateVisible] =
     useState(true);
@@ -53,7 +52,8 @@ export function Map() {
   const [location, setLocation] = useState(null);
   const [markers, setMarkers] = useState([]);
   const { latitude, longitude, setCoordinates } = useSelectedCardsCoordinates();
-
+  const { events } = useEventsStore();
+  const { interests } = useInterestsStore();
   useEffect(() => {
     requestLocationPermission();
   }, []);
@@ -68,34 +68,11 @@ export function Map() {
   }, [latitude, longitude]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const token = await getToken().then(
-          (credential) => credential.password
-        );
-        const response = await fetch(`http://localhost:3333/events`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    const newMarkers = events.map((event) =>
+      createMarker(event.title, event.latitude, event.longitude)
+    );
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const eventsData = await response.json();
-
-        const newMarkers = eventsData.events.map((event) =>
-          createMarker(event.title, event.latitude, event.longitude)
-        );
-
-        setMarkers((prevMarkers) => [...prevMarkers, ...newMarkers]);
-      } catch (error) {
-        console.log({ error });
-      }
-    };
-
-    fetchEvents();
+    setMarkers((prevMarkers) => [...prevMarkers, ...newMarkers]);
   }, []);
 
   const setLocationData = (latitude, longitude) => {
@@ -156,25 +133,6 @@ export function Map() {
       console.warn(err);
     }
   };
-
-  useEffect(() => {
-    const fetchInterests = async () => {
-      const token = await getToken().then((credential) => credential.password);
-      const interestsData = await fetch(`http://localhost:3333/interests`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((data) => data)
-        .then((response) => response.json())
-        .catch((error) => {
-          console.log({ error });
-        });
-      setInterests(interestsData.interests);
-    };
-
-    fetchInterests();
-  }, []);
 
   const requestIOSLocationPermission = async () => {
     try {

@@ -17,6 +17,13 @@ import { Map } from "./src/screens/Map";
 import { Order } from "./src/screens/Order";
 import { SignIn } from "./src/screens/SignIn";
 
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "ViewPropTypes will be removed",
+  "ColorPropType will be removed",
+]);
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,

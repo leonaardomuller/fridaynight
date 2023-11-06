@@ -11,7 +11,7 @@ import {
   useTheme,
   VStack,
 } from "native-base";
-import { MagnifyingGlass, SignOut, MapPin } from "phosphor-react-native";
+import { MagnifyingGlass } from "phosphor-react-native";
 import { Alert } from "react-native";
 import { getGenericPassword as getToken } from "react-native-keychain";
 import auth from "@react-native-firebase/auth";
@@ -20,86 +20,23 @@ import { useNavigation } from "@react-navigation/native";
 import { LargeEventCard } from "../components/LargeEventCard";
 import { SmallEventCard } from "../components/SmallEventCard";
 import { useCallback, useEffect, useState } from "react";
-
-type LocationDetails = {
-  country_state: string;
-  city: string;
-  country: string;
-  country_code: string;
-  neighbourhood?: string;
-  postcode: string;
-  railway?: string;
-  road: string;
-  state: string;
-};
+import { useMyCurrentLocationStore } from "../stores/my-current-location-store";
+import { useEventsStore } from "../stores/events-store";
+import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";
 
 export function Home() {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const [currentAddress, setCurrentAddress] = useState<LocationDetails>(
-    {} as LocationDetails
-  );
-  const [events, setEvents] = useState([]);
 
-  const getLocation = useCallback(async () => {
-    try {
-      Geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
-        fetch(url)
-          .then((res) => res.json())
-          .then((data) =>
-            setCurrentAddress({
-              country_state: data.address["ISO3166-2-lvl4"],
-              city: data.address.city,
-              country: data.address.country,
-              country_code: data.address.country_code,
-              neighbourhood: data.address.neighbourhood,
-              postcode: data.address.postcode,
-              railway: data.address.railway,
-              road: data.address.road,
-              state: data.address.state,
-            })
-          );
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const { setIsAuthenticated } = useUserAuthenticatedStore();
 
-  useEffect(() => {
-    getLocation();
-  }, []);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const token = await getToken().then(
-          (credential) => credential.password
-        );
-        const response = await fetch(`http://localhost:3333/events`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const eventsData = await response.json();
-        setEvents(eventsData.events);
-      } catch (error) {
-        console.log({ error });
-      }
-    };
-
-    fetchEvents();
-  }, []);
+  const { events } = useEventsStore();
+  const { city, country_state } = useMyCurrentLocationStore();
 
   function handleLogout() {
     auth()
       .signOut()
+      .then(() => setIsAuthenticated(false))
       .catch((error) => {
         console.log(error);
         return Alert.alert("Sair", "Não foi possível fazer logout.");
@@ -112,10 +49,6 @@ export function Home() {
 
   function handleNavigateToMapPage() {
     navigation.navigate("map");
-  }
-
-  function handleNavigateToDetailsPage() {
-    navigation.navigate("details");
   }
 
   return (
@@ -148,9 +81,7 @@ export function Home() {
             <Text fontSize={16} color={colors.gray[1]}>
               Find throw the map
             </Text>
-            <Text color={colors.gray[1]}>
-              {currentAddress.city + ", " + currentAddress.country_state}
-            </Text>
+            <Text color={colors.gray[1]}>{city + ", " + country_state}</Text>
           </VStack>
           <Box h="50px" w="50px">
             <Image

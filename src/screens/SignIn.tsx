@@ -9,13 +9,17 @@ import { setGenericPassword as setToken } from "react-native-keychain";
 import Logo from "../assets/logo.svg";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
+import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";
+import { useLoadingStore } from "../stores/loading-store";
 
 export function SignIn() {
   const { colors } = useTheme();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { isLoading, setIsLoading } = useLoadingStore();
+  const { setIsAuthenticated } = useUserAuthenticatedStore();
 
   async function handleSignIn() {
     if (!email || !password) {
@@ -27,37 +31,28 @@ export function SignIn() {
     try {
       const response = await auth().signInWithEmailAndPassword(email, password);
       const token = await response.user.getIdTokenResult();
-
-      if (
-        new Date(token.expirationTime).getTime() <=
-        Date.now() + 5 * 60 * 1000
-      ) {
-        // If the token is about to expire in 5 minutes
-        const refreshedToken = await response.user.getIdToken(true);
-        await setToken("access_token", refreshedToken);
-        console.log("Token Refreshed");
-      } else {
-        console.log("Failed to Refresh Token");
-        await setToken("access_token", token.token);
-      }
-
-      setIsLoading(false);
+      await setToken("access_token", token.token);
+      setIsAuthenticated(true);
     } catch (error) {
       console.log(error);
-      setIsLoading(false);
+      setIsAuthenticated(false);
 
+      let errorMessage = "Não foi possível acessar.";
       switch (error.code) {
         case "auth/invalid-email":
-          Alert.alert("Login", "E-mail inválida.");
+          errorMessage = "E-mail inválida.";
           break;
         case "auth/user-not-found":
         case "auth/wrong-password":
-          Alert.alert("Login", "E-mail ou senha inválidos.");
+          errorMessage = "E-mail ou senha inválidos.";
           break;
         default:
-          Alert.alert("Login", error.message || "Não foi possível acessar.");
+          errorMessage = error.message || errorMessage;
           break;
       }
+      Alert.alert("Login", errorMessage);
+    } finally {
+      setIsLoading(false); // This will always execute regardless of try/catch result
     }
   }
 

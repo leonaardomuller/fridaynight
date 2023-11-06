@@ -10,7 +10,6 @@ import {
   useTheme,
   VStack,
 } from "native-base";
-import { Heart } from "phosphor-react-native";
 import { formatDate } from "../utils/format-date";
 
 export function SmallEventCard(props) {
