@@ -54,6 +54,7 @@ export function Map() {
   const { latitude, longitude, setCoordinates } = useSelectedCardsCoordinates();
   const { events } = useEventsStore();
   const { interests } = useInterestsStore();
+
   useEffect(() => {
     requestLocationPermission();
   }, []);
@@ -198,8 +199,6 @@ export function Map() {
   const clearForm = () => {
     setEventName("");
     setEventDescription("");
-    setSelectedStartsDate(null);
-    setSelectedEndsDate(null);
   };
 
   const onSubmitForm = () => {
@@ -341,6 +340,7 @@ export function Map() {
                 }
               >
                 {interests?.map((interest) => {
+                  console.log(interests);
                   return (
                     <Picker.Item
                       key={interest.id}

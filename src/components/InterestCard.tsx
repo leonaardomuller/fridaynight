@@ -8,7 +8,6 @@ import {
   View,
 } from "native-base";
 import React, { useState } from "react";
-import { Customer } from "../screens/Interests";
 import RockSVG from "../assets/interests/rock.svg";
 import SertanejoSVG from "../assets/interests/sertanejo.svg";
 import ReggaeSVG from "../assets/interests/reggae.svg";
@@ -17,8 +16,8 @@ import CountrySVG from "../assets/interests/country.svg";
 interface InterestCardProps {
   id: string;
   gender: string;
-  imageUrl: string;
-  followers: Customer[];
+  imageUrl: string[];
+  followers: any[];
   index: number;
   handleSelectInterests: (interestSelected: string) => void;
 }
@@ -34,7 +33,7 @@ const genreImages = {
 
 export const InterestCard: React.FC<InterestCardProps> = ({
   id,
-  imageUrl = `https://source.unsplash.com/400x400/?music`,
+  imageUrl = [`https://source.unsplash.com/400x400/?music`],
   gender,
   followers,
   handleSelectInterests,
@@ -46,7 +45,7 @@ export const InterestCard: React.FC<InterestCardProps> = ({
 
   const imageSource = genreImages[gender.toLowerCase()]
     ? genreImages[gender.toLowerCase()]
-    : { uri: imageUrl };
+    : { uri: imageUrl[0] };
 
   const handlePress = () => {
     setIsSelected(!isSelected);

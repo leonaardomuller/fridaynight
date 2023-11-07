@@ -13,26 +13,15 @@ import { InterestCard } from "../components/InterestCard";
 import { Header } from "../components/Header";
 import { useEffect, useState } from "react";
 import { getGenericPassword as getToken } from "react-native-keychain";
-
-export type Customer = {
-  id: string;
-  name: string;
-  interests: InterestProps[];
-};
-
-export type InterestProps = {
-  id: string;
-  gender: string;
-  imageUrl: string;
-  followers: Customer[];
-};
+import { useInterestsStore } from "../stores/interests-store";
 
 export function Interests() {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
-  const [interests, setInterests] = useState<InterestProps[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<String[]>([]);
+
+  const { interests, setInterests } = useInterestsStore();
 
   useEffect(() => {
     const fetchInterests = async () => {
@@ -129,19 +118,17 @@ export function Interests() {
           contentContainerStyle={{ paddingBottom: 64 }}
         >
           <HStack flexWrap="wrap">
-            {interests?.map(
-              ({ id, gender, imageUrl, followers }: InterestProps, index) => (
-                <InterestCard
-                  key={id}
-                  id={id}
-                  gender={gender}
-                  imageUrl={imageUrl}
-                  followers={followers}
-                  index={index}
-                  handleSelectInterests={handleSelectInterests}
-                />
-              )
-            )}
+            {interests?.map(({ id, gender, imageUrl, followers }, index) => (
+              <InterestCard
+                key={id}
+                id={id}
+                gender={gender}
+                imageUrl={imageUrl}
+                followers={followers}
+                index={index}
+                handleSelectInterests={handleSelectInterests}
+              />
+            ))}
           </HStack>
         </ScrollView>
         <Button title="Finish" onPress={handleSetSelectedInterests} />
