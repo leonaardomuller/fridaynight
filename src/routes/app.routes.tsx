@@ -1,45 +1,43 @@
-// app.routes.tsx
-import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons, Entypo } from "@expo/vector-icons";
 
-import ProtectedRoute from "./ProtectedRoute";
 import { Home } from "../screens/Home";
 import { Details } from "../screens/Details";
 import { Interests } from "../screens/Interests";
 import { Map } from "../screens/Map";
 import { Order } from "../screens/Order";
 import { Search } from "../screens/Search";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import { Ionicons, Entypo } from "@expo/vector-icons";
+import { OwnerMap } from "../screens/Owner/OwnerMap";
 import { PostLogin } from "../screens/PostLogin";
 import { SignIn } from "../screens/SignIn";
+import ProtectedRoute from "./ProtectedRoute";
 
 const HomeStack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+// Profile 1 = Event User
+// Profile 2 = Event Owner
+const profile = 2;
 
 export function HomeStackScreen() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="post-login" component={PostLogin} />
-      <HomeStack.Screen name="home">
-        {() => <ProtectedRoute ProtectedScreen={Home} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="interests">
-        {() => <ProtectedRoute ProtectedScreen={Interests} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="map">
-        {() => <ProtectedRoute ProtectedScreen={Map} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="order">
-        {() => <ProtectedRoute ProtectedScreen={Order} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="details">
-        {() => <ProtectedRoute ProtectedScreen={Details} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="search">
-        {() => <ProtectedRoute ProtectedScreen={Search} />}
-      </HomeStack.Screen>
+      <HomeStack.Screen name="home" component={Home} />
+      <HomeStack.Screen name="interests" component={Interests} />
+      <HomeStack.Screen name="map" component={Map} />
+      <HomeStack.Screen name="order" component={Order} />
+      <HomeStack.Screen name="details" component={Details} />
+      <HomeStack.Screen name="search" component={Search} />
       <HomeStack.Screen name="login" component={SignIn} />
+    </HomeStack.Navigator>
+  );
+}
+
+export function OwnerHomeStackScreen() {
+  return (
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="map" component={OwnerMap} />
     </HomeStack.Navigator>
   );
 }
@@ -47,25 +45,13 @@ export function HomeStackScreen() {
 export function MapStackScreen() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="map">
-        {() => <ProtectedRoute ProtectedScreen={Map} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="home">
-        {() => <ProtectedRoute ProtectedScreen={Home} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="interests">
-        {() => <ProtectedRoute ProtectedScreen={Interests} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="order">
-        {() => <ProtectedRoute ProtectedScreen={Order} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="details">
-        {() => <ProtectedRoute ProtectedScreen={Details} />}
-      </HomeStack.Screen>
+      <HomeStack.Screen name="map" component={Map} />
+      <HomeStack.Screen name="home" component={Home} />
+      <HomeStack.Screen name="interests" component={Interests} />
+      <HomeStack.Screen name="order" component={Order} />
+      <HomeStack.Screen name="details" component={Details} />
       <HomeStack.Screen name="post-login" component={PostLogin} />
-      <HomeStack.Screen name="search">
-        {() => <ProtectedRoute ProtectedScreen={Search} />}
-      </HomeStack.Screen>
+      <HomeStack.Screen name="search" component={Search} />
       <HomeStack.Screen name="login" component={SignIn} />
     </HomeStack.Navigator>
   );
@@ -74,29 +60,19 @@ export function MapStackScreen() {
 export function SearchStackScreen() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="search">
-        {() => <ProtectedRoute ProtectedScreen={Search} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="map">
-        {() => <ProtectedRoute ProtectedScreen={Map} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="home">
-        {() => <ProtectedRoute ProtectedScreen={Home} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="interests">
-        {() => <ProtectedRoute ProtectedScreen={Interests} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="order">
-        {() => <ProtectedRoute ProtectedScreen={Order} />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="details">
-        {() => <ProtectedRoute ProtectedScreen={Details} />}
-      </HomeStack.Screen>
+      <HomeStack.Screen name="search" component={Search} />
+      <HomeStack.Screen name="map" component={Map} />
+      <HomeStack.Screen name="home" component={Home} />
+      <HomeStack.Screen name="interests" component={Interests} />
+      <HomeStack.Screen name="order" component={Order} />
+      <HomeStack.Screen name="details" component={Details} />
       <HomeStack.Screen name="post-login" component={PostLogin} />
       <HomeStack.Screen name="login" component={SignIn} />
     </HomeStack.Navigator>
   );
 }
+
+const Tab = createBottomTabNavigator();
 
 export function AppRoutes() {
   return (
@@ -134,5 +110,3 @@ export function AppRoutes() {
     </Tab.Navigator>
   );
 }
-
-export default AppRoutes;

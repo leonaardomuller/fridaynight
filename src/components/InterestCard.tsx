@@ -5,9 +5,15 @@ import {
   Container,
   Pressable,
   useTheme,
+  View,
 } from "native-base";
 import React, { useState } from "react";
 import { Customer } from "../screens/Interests";
+import RockSVG from "../assets/interests/rock.svg";
+import SertanejoSVG from "../assets/interests/sertanejo.svg";
+import ReggaeSVG from "../assets/interests/reggae.svg";
+import EletronicaSVG from "../assets/interests/eletronica.svg";
+import CountrySVG from "../assets/interests/country.svg";
 interface InterestCardProps {
   id: string;
   gender: string;
@@ -17,9 +23,18 @@ interface InterestCardProps {
   handleSelectInterests: (interestSelected: string) => void;
 }
 
+const genreImages = {
+  rock: <RockSVG height="90px" width="100%" />,
+  sertanejo: <SertanejoSVG height="90px" width="100%" />,
+  eletronica: <EletronicaSVG height="90px" width="100%" />,
+  reggae: <ReggaeSVG height="90px" width="100%" />,
+  country: <CountrySVG height="90px" width="100%" />,
+  // default: require('../assets/interests/default.svg'), // Default image if you have one
+};
+
 export const InterestCard: React.FC<InterestCardProps> = ({
   id,
-  imageUrl,
+  imageUrl = `https://source.unsplash.com/400x400/?music`,
   gender,
   followers,
   handleSelectInterests,
@@ -28,6 +43,10 @@ export const InterestCard: React.FC<InterestCardProps> = ({
   const { colors } = useTheme();
   const [isSelected, setIsSelected] = useState(false);
   const isLast = index % 2 === 1;
+
+  const imageSource = genreImages[gender.toLowerCase()]
+    ? genreImages[gender.toLowerCase()]
+    : { uri: imageUrl };
 
   const handlePress = () => {
     setIsSelected(!isSelected);
@@ -51,16 +70,9 @@ export const InterestCard: React.FC<InterestCardProps> = ({
         borderColor={isSelected ? colors.purple[1] : colors.white}
         rounded="3xl"
       >
-        <Image
-          source={{
-            uri: `https://source.unsplash.com/400x400/?${gender}%20music`,
-          }}
-          alt="Interest"
-          h="90px"
-          w="90%"
-          mt={2}
-          rounded="2xl"
-        />
+        <View height="90px" width="100%" marginTop={2} rounded="2xl">
+          {imageSource}
+        </View>
         <Heading fontSize="xl" mt={2} mb={2}>
           {gender}
         </Heading>
