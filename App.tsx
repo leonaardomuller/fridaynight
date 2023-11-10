@@ -10,13 +10,6 @@ import { Routes } from "./src/routes";
 
 import { Loading } from "./src/components/Loading";
 
-import { Details } from "./src/screens/Details";
-import { Home } from "./src/screens/Home";
-import { Interests } from "./src/screens/Interests";
-import { Map } from "./src/screens/Map";
-import { Order } from "./src/screens/Order";
-import { SignIn } from "./src/screens/SignIn";
-
 import { LogBox } from "react-native";
 
 LogBox.ignoreLogs([

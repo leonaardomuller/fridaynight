@@ -11,6 +11,7 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";
 import { useLoadingStore } from "../stores/loading-store";
+import { useNavigation } from "@react-navigation/native";
 
 export function SignIn() {
   const { colors } = useTheme();
@@ -18,8 +19,14 @@ export function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigation = useNavigation();
+
   const { isLoading, setIsLoading } = useLoadingStore();
   const { setIsAuthenticated } = useUserAuthenticatedStore();
+
+  async function handleNavigateSignUp() {
+    navigation.navigate("sign-up");
+  }
 
   async function handleSignIn() {
     if (!email || !password) {
@@ -83,6 +90,16 @@ export function SignIn() {
         w="full"
         onPress={handleSignIn}
         isLoading={isLoading}
+        position="relative"
+        mb={4}
+      />
+      <Button
+        title="Criar Usuário"
+        w="full"
+        onPress={handleNavigateSignUp}
+        isLoading={isLoading}
+        position="relative"
+        variant="secondary"
       />
     </VStack>
   );

@@ -8,17 +8,23 @@ import { useEventsStore } from "../stores/events-store";
 import { useInterestsStore } from "../stores/interests-store";
 import { useNavigation } from "@react-navigation/native";
 import { Animated, Easing } from "react-native";
+import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";
 
 export function PostLogin() {
   const spinValue = useRef(new Animated.Value(0)).current;
   const theme = useTheme();
   const navigation = useNavigation();
   const { setMyCurrentLocation } = useMyCurrentLocationStore();
+  const { isAuthenticated } = useUserAuthenticatedStore();
   const { setEvents } = useEventsStore();
   const { setInterests } = useInterestsStore();
 
   function navigateToInterestPage() {
     navigation.navigate("interests");
+  }
+
+  function navigateToHomePage() {
+    navigation.navigate("home");
   }
 
   const getCurrentLocation = useCallback(async () => {
@@ -88,6 +94,30 @@ export function PostLogin() {
     setInterests(interestsData.interests);
   }, []);
 
+  const getUser = useCallback(async () => {
+    try {
+      const token = await getToken().then((credential) => credential.password);
+      const response = await fetch(`http://localhost:3333/account`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const userData = await response.json();
+      if (userData.user.interests.length > 0) {
+        navigateToHomePage();
+        return;
+      }
+      navigateToInterestPage();
+    } catch (error) {
+      console.log({ error });
+    }
+  }, []);
+
   const spin = () => {
     spinValue.setValue(0);
     Animated.timing(spinValue, {
@@ -108,11 +138,13 @@ export function PostLogin() {
   }, []);
 
   useEffect(() => {
-    getInterests();
-    getCurrentLocation();
-    getEvents();
-    setTimeout(navigateToInterestPage, 2000);
-  }, []);
+    if (isAuthenticated) {
+      getCurrentLocation();
+      getEvents();
+      getInterests();
+      getUser();
+    }
+  }, [isAuthenticated]);
 
   return (
     <View

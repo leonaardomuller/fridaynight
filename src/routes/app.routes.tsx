@@ -23,8 +23,8 @@ export function HomeStackScreen() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="post-login" component={PostLogin} />
-      <HomeStack.Screen name="home" component={Home} />
       <HomeStack.Screen name="interests" component={Interests} />
+      <HomeStack.Screen name="home" component={Home} />
       <HomeStack.Screen name="map" component={Map} />
       <HomeStack.Screen name="order" component={Order} />
       <HomeStack.Screen name="details" component={Details} />

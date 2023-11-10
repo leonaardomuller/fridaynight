@@ -97,10 +97,10 @@ export function Interests() {
         console.log({ error });
       })
       .finally(() => {
+        setSelectedInterests([]);
         navigation.navigate("home");
         setIsLoading(false);
       });
-    setSelectedInterests([]);
   }
 
   return (
@@ -118,17 +118,19 @@ export function Interests() {
           contentContainerStyle={{ paddingBottom: 64 }}
         >
           <HStack flexWrap="wrap">
-            {interests?.map(({ id, gender, imageUrl, followers }, index) => (
-              <InterestCard
-                key={id}
-                id={id}
-                gender={gender}
-                imageUrl={imageUrl}
-                followers={followers}
-                index={index}
-                handleSelectInterests={handleSelectInterests}
-              />
-            ))}
+            {interests?.map((props, index) => {
+              return (
+                <InterestCard
+                  key={props.id}
+                  id={props.id}
+                  gender={props.gender}
+                  imageUrl={props.imageUrl}
+                  followers={props.followers}
+                  index={index}
+                  handleSelectInterests={handleSelectInterests}
+                />
+              );
+            })}
           </HStack>
         </ScrollView>
         <Button title="Finish" onPress={handleSetSelectedInterests} />

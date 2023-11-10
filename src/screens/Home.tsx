@@ -1,6 +1,5 @@
 import {
   Box,
-  Center,
   Heading,
   HStack,
   IconButton,
@@ -13,13 +12,10 @@ import {
 } from "native-base";
 import { MagnifyingGlass } from "phosphor-react-native";
 import { Alert } from "react-native";
-import { getGenericPassword as getToken } from "react-native-keychain";
 import auth from "@react-native-firebase/auth";
-import Geolocation from "react-native-geolocation-service";
 import { useNavigation } from "@react-navigation/native";
 import { LargeEventCard } from "../components/LargeEventCard";
 import { SmallEventCard } from "../components/SmallEventCard";
-import { useCallback, useEffect, useState } from "react";
 import { useMyCurrentLocationStore } from "../stores/my-current-location-store";
 import { useEventsStore } from "../stores/events-store";
 import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";

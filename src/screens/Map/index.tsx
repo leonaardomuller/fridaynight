@@ -340,7 +340,6 @@ export function Map() {
                 }
               >
                 {interests?.map((interest) => {
-                  console.log(interests);
                   return (
                     <Picker.Item
                       key={interest.id}
