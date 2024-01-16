@@ -46,7 +46,7 @@ export function Card() {
             <Box flexDirection="row" alignItems="center">
               <IconButton icon={<MapPin color={colors.gray[1]} size={16} />} />
               <Text color={colors.gray[1]} mb={2}>
-                Brooklyn - 1,2km
+                North Beach - 1,2km
               </Text>
             </Box>
             <Members />

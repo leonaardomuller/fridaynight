@@ -18,14 +18,19 @@ export function LargeEventCard(props) {
   const navigation = useNavigation();
 
   function handleNavigateToDetailsPage() {
-    navigation.navigate("details");
+    navigation.navigate("details", {
+      ...props,
+    });
   }
   return (
     <VStack bg="white" h="full" maxH="240" rounded="xl">
       <Pressable onPress={handleNavigateToDetailsPage}>
         <Image
           source={{
-            uri: "https://picsum.photos/200/200",
+            uri:
+              props.imagesUrl[1] ||
+              props.imagesUrl[0] ||
+              "https://picsum.photos/200/200",
           }}
           alt="Alternate Text"
           w="full"
@@ -38,10 +43,10 @@ export function LargeEventCard(props) {
             <Box flexDirection="row" alignItems="center">
               <IconButton icon={<MapPin color={colors.gray[1]} size={16} />} />
               <Text color={colors.gray[1]} mb={2}>
-                Brooklyn - 1,2km
+                North Beach - 1,2km
               </Text>
             </Box>
-            <Members />
+            {/* <Members /> */}
           </HStack>
         </VStack>
       </Pressable>

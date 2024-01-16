@@ -105,12 +105,12 @@ export function Interests() {
 
   return (
     <VStack flex={1} bg="white">
-      <Header title="Interests" showButtonGoBack={false} />
+      <Header title="Interesses" showButtonGoBack={false} />
       <VStack flex={1} bg="gray.4" px={8} pt={4} rounded="2xl">
-        <Heading mb={2}>Choose Interests</Heading>
+        <Heading mb={2}>Escolha seus interesses</Heading>
         <Text color={colors.gray[1]} mb={2}>
-          Choose your favorite interest to get new shows all in one place
-          related to it
+          Escolha seus interesses favoritos para obter novos eventos em um só
+          lugar.
         </Text>
         <ScrollView
           pt={8}
@@ -133,7 +133,7 @@ export function Interests() {
             })}
           </HStack>
         </ScrollView>
-        <Button title="Finish" onPress={handleSetSelectedInterests} />
+        <Button title="Pronto" onPress={handleSetSelectedInterests} />
       </VStack>
     </VStack>
   );

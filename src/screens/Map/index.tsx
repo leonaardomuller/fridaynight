@@ -6,7 +6,17 @@ import {
   useWindowDimensions,
   Modal,
 } from "react-native";
-import { HStack, View, Button, Text, Box, ScrollView } from "native-base";
+import storage from "@react-native-firebase/storage";
+import {
+  HStack,
+  View,
+  Text,
+  Box,
+  ScrollView,
+  Button as NativeBaseButton,
+  IconButton,
+  useTheme,
+} from "native-base";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MapView, { Marker, Circle, MapPressEvent } from "react-native-maps";
 import { CustomMarker } from "./components/CustomMarker";
@@ -21,10 +31,19 @@ import { Input } from "../../components/Input";
 import { Picker } from "@react-native-picker/picker";
 import { useEventsStore } from "../../stores/events-store";
 import { useInterestsStore } from "../../stores/interests-store";
+import { Button } from "../../components/Button";
+import { X } from "phosphor-react-native";
+import {
+  ImageLibraryOptions,
+  launchImageLibrary,
+} from "react-native-image-picker";
 
 export function Map() {
   const carouselRef = useRef(null);
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
+
+  const [pickedImages, setPickedImages] = useState<{ uri: string }[]>([]);
 
   const [initialRegion, setInitialRegion] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -70,11 +89,16 @@ export function Map() {
 
   useEffect(() => {
     const newMarkers = events.map((event) =>
-      createMarker(event.title, event.latitude, event.longitude)
+      createMarker(
+        event.title,
+        event.latitude,
+        event.longitude,
+        event.imagesUrl
+      )
     );
 
-    setMarkers((prevMarkers) => [...prevMarkers, ...newMarkers]);
-  }, []);
+    setMarkers(newMarkers);
+  }, [events]);
 
   const setLocationData = (latitude, longitude) => {
     setInitialRegion(createRegion(latitude, longitude));
@@ -82,7 +106,50 @@ export function Map() {
     setLocation({ latitude, longitude });
   };
 
-  const createMarker = (name, latitude, longitude) => ({
+  const pickImage = async () => {
+    const options: ImageLibraryOptions = {
+      selectionLimit: 0, // Set to 0 for no limit
+      mediaType: "photo",
+    };
+
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log("User cancelled image picker");
+      } else if (response.errorMessage) {
+        console.log("ImagePicker Error: ", response.errorMessage);
+      } else {
+        const sources = response.assets?.map((asset) => ({ uri: asset.uri }));
+        setPickedImages((prevImages) => [...prevImages, ...(sources ?? [])]);
+      }
+    });
+  };
+
+  const uploadAllImages = async () => {
+    const uploadPromises = pickedImages.map(async (image) => {
+      const url = await uploadImage(image.uri);
+      return url; // Return the URL of the uploaded image
+    });
+
+    return Promise.all(uploadPromises); // Wait for all uploads to complete
+  };
+
+  const uploadImage = async (uri) => {
+    const fileExtension = uri.split(".").pop();
+
+    const filename = `${Date.now()}.${fileExtension}`;
+    const uploadUri = Platform.OS === "ios" ? uri.replace("file://", "") : uri;
+    const task = storage().ref(filename).putFile(uploadUri);
+
+    try {
+      await task;
+      return await storage().ref(filename).getDownloadURL();
+    } catch (e) {
+      console.error(e);
+      return "";
+    }
+  };
+
+  const createMarker = (name, latitude, longitude, imagesUrl) => ({
     name,
     location: {
       latitude,
@@ -90,6 +157,7 @@ export function Map() {
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     },
+    imagesUrl,
   });
 
   const createRegion = (latitude, longitude) => ({
@@ -156,7 +224,7 @@ export function Map() {
     setNewMarkerLongitude(longitude);
   };
 
-  const createEvent = async () => {
+  const createEvent = async (uploadedImageUrls: string[]) => {
     try {
       const token = await getToken().then((credential) => credential.password);
 
@@ -172,7 +240,7 @@ export function Map() {
           gender: selectedGender,
           latitude: newMarkerLatitude,
           longitude: newMarkerLongitude,
-          imagesUrl: ["/assets/image1", "/assets/image2", "/assets/image3"],
+          imagesUrl: uploadedImageUrls,
           startsAt: selectedStartsDate,
           finishAt: selectedEndsDate,
         }),
@@ -187,7 +255,8 @@ export function Map() {
       const newMarker = createMarker(
         eventName,
         newMarkerLatitude,
-        newMarkerLongitude
+        newMarkerLongitude,
+        uploadedImageUrls
       );
       setMarkers([...markers, newMarker]);
       return jsonData;
@@ -199,11 +268,19 @@ export function Map() {
   const clearForm = () => {
     setEventName("");
     setEventDescription("");
+    setPickedImages([]);
   };
 
-  const onSubmitForm = () => {
-    createEvent();
-    setModalVisible(false);
+  const onSubmitForm = async () => {
+    try {
+      const uploadedImageUrls = await uploadAllImages();
+
+      createEvent(uploadedImageUrls);
+    } catch (error) {
+      console.error("Error uploading images:", error);
+    } finally {
+      setModalVisible(false);
+    }
   };
 
   const onStartsDateChange = (event, selectedValue) => {
@@ -257,9 +334,9 @@ export function Map() {
         onRegionChangeComplete={setRegion}
         onPress={onMapPress}
       >
-        {markers.map((data) => (
+        {markers.map((data, index) => (
           <Marker
-            key={data.name}
+            key={`${data.name}-${index}`}
             image={require("./pin.png")}
             coordinate={data.location}
           >
@@ -277,9 +354,9 @@ export function Map() {
         <Carousel
           ref={carouselRef}
           data={markers}
-          renderItem={() => (
+          renderItem={({ item }) => (
             <View left={10}>
-              <Card {...currentMarker} />
+              <Card {...item} />
             </View>
           )}
           sliderWidth={width}
@@ -299,10 +376,20 @@ export function Map() {
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ScrollView width={300} marginTop={100}>
+          <ScrollView width={320} marginTop={100}>
             <Box padding={5} bg="white" shadow={3} borderRadius="lg">
-              <Text marginBottom={4}>New Event</Text>
-              <Button onPress={() => setModalVisible(false)}>Fechar</Button>
+              <HStack justifyContent={"space-between"} alignItems={"center"}>
+                <Text color={"purple.1"} fontWeight={"bold"} fontSize={"lg"}>
+                  New Event
+                </Text>
+
+                <IconButton
+                  bg="white"
+                  opacity={50}
+                  icon={<X size={26} color={colors.gray[1]} />}
+                  onPress={() => setModalVisible(false)}
+                />
+              </HStack>
               <Input
                 placeholder="Name"
                 value={eventName}
@@ -318,7 +405,7 @@ export function Map() {
                 variant="filled"
                 marginBottom={4}
               />
-
+              <Text>Latitude</Text>
               <Input
                 placeholder="Latitude"
                 variant="filled"
@@ -326,6 +413,7 @@ export function Map() {
                 isReadOnly={true}
                 marginBottom={4}
               />
+              <Text>Longitude</Text>
               <Input
                 placeholder="Longitude"
                 value={newMarkerLongitude.toString()}
@@ -333,6 +421,7 @@ export function Map() {
                 variant="filled"
                 marginBottom={4}
               />
+              <Text>Genre</Text>
               <Picker
                 selectedValue={selectedGender}
                 onValueChange={(itemValue, itemIndex) =>
@@ -367,7 +456,16 @@ export function Map() {
                   onChange={onEndsDateChange}
                 />
               )}
-              <Button onPress={onSubmitForm}>Submit</Button>
+              <Button
+                position="relative"
+                title="Pick Image"
+                onPress={pickImage}
+              />
+              <Button
+                position="relative"
+                title="Submit"
+                onPress={onSubmitForm}
+              />
             </Box>
           </ScrollView>
         </View>

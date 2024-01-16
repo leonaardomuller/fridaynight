@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Center,
   HStack,
@@ -21,35 +22,45 @@ import { useMyCurrentLocationStore } from "../stores/my-current-location-store";
 
 export function Search() {
   const { colors } = useTheme();
-
   const { events } = useEventsStore();
   const { road, city } = useMyCurrentLocationStore();
 
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleSearchChange = (text) => {
+    setSearchInput(text);
+  };
+
+  const filteredEvents = events.filter((event) => {
+    return event.title.toLowerCase().includes(searchInput.toLowerCase());
+  });
+
   return (
     <VStack flex={1} bg="white">
-      <Header title="Search"></Header>
+      <Header title="Buscar"></Header>
       <VStack flex={1} bg="gray.4" px={8} pt={4} rounded="2xl" space={4}>
         <HStack
           w="full"
-          maxW={250}
+          // maxW={250}
           alignItems="center"
           justifyContent="space-between"
           h={14}
         >
           <Input
             w="full"
-            placeholder="Search events in..."
+            placeholder="Procure eventos em..."
             mb={4}
             mt={4}
+            onChangeText={handleSearchChange}
             InputLeftElement={
               <Icon as={<MagnifyingGlass color={colors.gray[1]} />} ml={4} />
             }
           />
-          <Center h="full" bg="white" rounded="2xl" px={2} ml={4}>
+          {/* <Center h="full" bg="white" rounded="2xl" px={2} ml={4}>
             <IconButton
               icon={<SlidersHorizontal color={colors.gray[1]} size={24} />}
             />
-          </Center>
+          </Center> */}
         </HStack>
         <HStack
           bg="gray.3"
@@ -68,7 +79,7 @@ export function Search() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 64 }}
         >
-          {events.map((event) => {
+          {filteredEvents.map((event) => {
             return <SmallEventCard key={event.id} {...event} />;
           })}
         </ScrollView>

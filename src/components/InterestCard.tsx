@@ -13,6 +13,7 @@ import SertanejoSVG from "../assets/interests/sertanejo.svg";
 import ReggaeSVG from "../assets/interests/reggae.svg";
 import EletronicaSVG from "../assets/interests/eletronica.svg";
 import CountrySVG from "../assets/interests/country.svg";
+import HipHop from "../assets/interests/hip-hop.svg";
 interface InterestCardProps {
   id: string;
   gender: string;
@@ -28,6 +29,7 @@ const genreImages = {
   eletronica: <EletronicaSVG height="90px" width="100%" />,
   reggae: <ReggaeSVG height="90px" width="100%" />,
   country: <CountrySVG height="90px" width="100%" />,
+  "hip hop": <HipHop height="90px" width="100%" />,
   // default: require('../assets/interests/default.svg'), // Default image if you have one
 };
 
@@ -46,6 +48,8 @@ export const InterestCard: React.FC<InterestCardProps> = ({
   const imageSource = genreImages[gender.toLowerCase()]
     ? genreImages[gender.toLowerCase()]
     : { uri: imageUrl[0] };
+
+  const genreImageComponent = genreImages[gender.toLowerCase()];
 
   const handlePress = () => {
     setIsSelected(!isSelected);
@@ -69,13 +73,20 @@ export const InterestCard: React.FC<InterestCardProps> = ({
         borderColor={isSelected ? colors.purple[1] : colors.white}
         rounded="3xl"
       >
-        <View height="90px" width="100%" marginTop={2} rounded="2xl">
-          {imageSource}
+        <View height="90px" width="90px" marginTop={2} rounded="2xl">
+          {genreImageComponent || (
+            <Image
+              source={{ uri: imageUrl[0] }}
+              alt="Genre Image"
+              height="90px"
+              width="100%"
+            />
+          )}
         </View>
         <Heading fontSize="xl" mt={2} mb={2}>
           {gender}
         </Heading>
-        <Text mb={4}>{followers?.length ?? 0} followers</Text>
+        <Text mb={4}>{followers?.length ?? 0} seguidores</Text>
       </Pressable>
     </Container>
   );

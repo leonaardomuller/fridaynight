@@ -17,7 +17,9 @@ export function SmallEventCard(props) {
   const navigation = useNavigation();
 
   function handleNavigateToDetailsPage() {
-    navigation.navigate("details");
+    navigation.navigate("details", {
+      ...props,
+    });
   }
 
   return (
@@ -25,7 +27,7 @@ export function SmallEventCard(props) {
       <HStack bg="white" rounded="xl">
         <Image
           source={{
-            uri: "https://picsum.photos/200/200",
+            uri: props.imagesUrl[0] || "https://picsum.photos/200/200",
           }}
           alt="Alternate Text"
           w={20}

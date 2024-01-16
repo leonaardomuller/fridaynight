@@ -19,8 +19,11 @@ export function Card(props) {
   const navigation = useNavigation();
 
   function handleNavigateToDetailsPage() {
-    navigation.navigate("details");
+    navigation.navigate("details", {
+      ...props,
+    });
   }
+
   return (
     <VStack
       mb={12}
@@ -34,7 +37,7 @@ export function Card(props) {
       <Pressable onPress={handleNavigateToDetailsPage}>
         <Image
           source={{
-            uri: "https://picsum.photos/200/200",
+            uri: props?.imagesUrl[0] || "https://picsum.photos/200/200",
           }}
           alt="Alternate Text"
           w="full"
@@ -47,7 +50,7 @@ export function Card(props) {
             <Box flexDirection="row" alignItems="center">
               <IconButton icon={<MapPin color={colors.gray[1]} size={16} />} />
               <Text color={colors.gray[1]} mb={2}>
-                Brooklyn - 1,2km
+                North Beach - 1,2km
               </Text>
             </Box>
             <Members />

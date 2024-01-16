@@ -91,7 +91,7 @@ export function AppRoutes() {
         name="Map"
         component={MapStackScreen}
         options={{
-          tabBarLabel: "Map",
+          tabBarLabel: "Mapa",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map" color={color} size={size} />
           ),
@@ -101,7 +101,7 @@ export function AppRoutes() {
         name="Search"
         component={SearchStackScreen}
         options={{
-          tabBarLabel: "Search",
+          tabBarLabel: "Buscar",
           tabBarIcon: ({ color, size }) => (
             <Entypo name="magnifying-glass" color={color} size={size} />
           ),

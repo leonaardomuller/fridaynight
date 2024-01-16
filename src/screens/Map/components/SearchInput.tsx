@@ -7,7 +7,7 @@ export function SearchInput() {
     <NativeBaseInput
       bg="white"
       opacity={50}
-      placeholder="Search People & Places"
+      placeholder=""
       width="85%"
       borderRadius="4"
       py="3"

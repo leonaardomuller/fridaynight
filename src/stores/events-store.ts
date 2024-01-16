@@ -1,11 +1,12 @@
 import { create } from "zustand";
 
-type Event = {
+export type Event = {
   id: string;
   title: string;
   description: string;
   latitude: number;
   longitude: number;
+  imagesUrl: string[];
   startsAt: string;
   endsAt: string;
 }

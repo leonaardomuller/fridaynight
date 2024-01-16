@@ -15,6 +15,7 @@ import { Alert } from "react-native";
 import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { LargeEventCard } from "../components/LargeEventCard";
+import PinOnMapSVG from "../assets/pin-on-map.svg";
 import { SmallEventCard } from "../components/SmallEventCard";
 import { useMyCurrentLocationStore } from "../stores/my-current-location-store";
 import { useEventsStore } from "../stores/events-store";
@@ -75,28 +76,28 @@ export function Home() {
         >
           <VStack alignSelf="center">
             <Text fontSize={16} color={colors.gray[1]}>
-              Find throw the map
+              Procure pelo mapa
             </Text>
             <Text color={colors.gray[1]}>{city + ", " + country_state}</Text>
           </VStack>
-          <Box h="50px" w="50px">
-            <Image
+          <Box h="45px" w="45px" rounded="xl">
+            <PinOnMapSVG height="100%" width="100%" />
+            {/* <Image
               source={{
                 uri: "https://picsum.photos/200/200",
               }}
               alt="Alternate Text"
               w="full"
               h="full"
-              rounded="xl"
-            />
+            /> */}
           </Box>
         </HStack>
       </Pressable>
 
-      <Heading mb={2}>Featured</Heading>
+      <Heading mb={2}>Mais popular</Heading>
       <LargeEventCard {...events[0]} />
       <Heading mb={2} mt={6}>
-        Popular Events
+        Eventos Populares
       </Heading>
 
       <ScrollView

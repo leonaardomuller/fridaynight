@@ -7,15 +7,17 @@ import { useMyCurrentLocationStore } from "../stores/my-current-location-store";
 import { useEventsStore } from "../stores/events-store";
 import { useInterestsStore } from "../stores/interests-store";
 import { useNavigation } from "@react-navigation/native";
-import { Animated, Easing } from "react-native";
+import { Alert, Animated, Easing } from "react-native";
+import auth from "@react-native-firebase/auth";
 import { useUserAuthenticatedStore } from "../stores/user-authenticated-store";
+import { Button } from "../components/Button";
 
 export function PostLogin() {
   const spinValue = useRef(new Animated.Value(0)).current;
   const theme = useTheme();
   const navigation = useNavigation();
   const { setMyCurrentLocation } = useMyCurrentLocationStore();
-  const { isAuthenticated } = useUserAuthenticatedStore();
+  const { isAuthenticated, setIsAuthenticated } = useUserAuthenticatedStore();
   const { setEvents } = useEventsStore();
   const { setInterests } = useInterestsStore();
 
@@ -25,6 +27,16 @@ export function PostLogin() {
 
   function navigateToHomePage() {
     navigation.navigate("home");
+  }
+
+  function handleLogout() {
+    auth()
+      .signOut()
+      .then(() => setIsAuthenticated(false))
+      .catch((error) => {
+        console.log(error);
+        return Alert.alert("Sair", "Não foi possível fazer logout.");
+      });
   }
 
   const getCurrentLocation = useCallback(async () => {
@@ -159,6 +171,7 @@ export function PostLogin() {
       <Text fontSize="xl" mt={4} color={theme.colors.gray[3]}>
         Loading...
       </Text>
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 }
