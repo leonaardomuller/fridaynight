@@ -28,7 +28,9 @@ cd fridaynight
 npm install
 
 3. Inicie o servidor de desenvolvimento
-npm start
+npm run ios
+ou
+npm run android
 
 ### Tecnologias 
 ![image](https://github.com/leonaardomuller/fridaynight/assets/60147880/5d591ca7-04ec-489e-94ca-1f5e18ac86c3)
@@ -50,3 +52,6 @@ npm start
 
 ### Encontrando eventos por nome
 ![image](https://github.com/leonaardomuller/fridaynight/assets/60147880/e8e0316b-be26-4eb3-b4cb-ba08de767fa2)
+
+Backend da aplicação:
+https://github.com/leonaardomuller/nestjs-clean
